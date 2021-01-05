@@ -1,0 +1,180 @@
+<canvas id="canvas"></canvas>
+
+<script>
+    
+    
+    canvasSize = [400,400];
+    gridSize = 20;
+    tileSize = [canvasSize[0]/gridSize,canvasSize[1]/gridSize];
+    vel = [0,0];
+    pos = [0,gridSize-1];
+    blocks = [[]];
+    ball = [5,10];
+    ballvel = [0.1,-0.05];
+
+    window.onload = function (){
+        canvas = document.getElementById("canvas");
+        canvas.width = canvasSize[0];
+        canvas.height = canvasSize[1];
+        ctx = canvas.getContext("2d");
+        document.addEventListener("keydown",keyPush);
+        document.addEventListener("keyup",keyUp)
+        var loop = setInterval(gameLoop, 1000/80);
+        for (var i = 0; i < 5; i++)
+        {
+            for (var j = 0; j < gridSize/2; j++)
+            {
+                blocks.push([j*2,i]);
+            }
+        }
+    }
+
+    function reset()
+    {
+        blocks = [[]];
+        ball = [5,10];
+        ballvel = [0.1,-0.15];
+        for (var i = 0; i < 5; i++)
+        {
+            for (var j = 0; j < gridSize/2; j++)
+            {
+                blocks.push([j*2,i]);
+            }
+        }
+    }
+
+    function keyPush(event)
+    {
+        switch(event.keyCode)
+        {
+            case 37:
+                vel = [-0.25,0]
+                break;
+            case 39:
+                vel = [0.25,0]
+                break;
+        }
+    }
+
+    function keyUp(event)
+    {
+        switch(event.keyCode)
+        {
+            case 37:
+                vel = [0,0]
+                break;
+            case 39:
+                vel = [0,0]
+                break;
+        }
+    }
+
+    function gameLoop()
+    {
+        
+
+        pos[0] += vel[0];
+        pos[1] += vel[1];
+
+        if (pos[0] < 0)
+        {
+            pos[0] = 0;
+        }
+        else if (pos[0] > gridSize - 2)
+        {
+            pos[0] = gridSize - 2;
+        }
+
+        
+
+        
+        
+        ball[0] += ballvel[0];
+        ball[1] += ballvel[1];
+
+        if (ball[0] < 0)
+        {
+            ballvel[0] = -ballvel[0];
+            ballvel[0] += Math.random()*0.1 - 0.05;
+            ball[0] = 0;
+        }
+        else if (ball[0] > gridSize - 1)
+        {
+            ballvel[0] = -ballvel[0];
+            ballvel[0] += Math.random()*0.1 - 0.05;
+            ball[0] = gridSize - 1;
+        }
+        if (ball[1] < 0)
+        {
+            ballvel[1] = -ballvel[1];
+            ballvel[1] += Math.random()*0.1 - 0.05;
+            ball[1] = 0;
+        }
+        else if (ball[1] > gridSize - 1)
+        {
+            reset();
+        }
+
+        if (ball[1] > gridSize - 2 && ball[0] > pos[0] - 1 && ball[0] < pos[0] + 2)
+        {
+            ballvel[1] = -Math.abs(ballvel[1]);
+            ballvel[0] += vel[0] * Math.random();
+            ballvel[1] -= Math.abs(vel[0]) * Math.random() * 0.5;
+        }
+
+        for (var i = 0; i < blocks.length; i++)
+        {
+            if (ball[1] < blocks[i][1] + 1 && ball[1] > blocks[i][1] && ball[0] > blocks[i][0] && ball[0] < blocks[i][0] + 2)
+            {
+                ballvel[1] = Math.abs(ballvel[1]) * Math.random() * 2;
+                blocks.splice(i,1);
+                break;
+            }
+        }
+
+        if (ballvel[0] > 0.4)
+        {
+            ballvel[0] = 0.4;
+        }
+        else if (ballvel[0] < -0.4)
+        {
+            ballvel[0] = -0.4
+        }
+        if (ballvel[1] > 0.4)
+        {
+            ballvel[1] = 0.4;
+        }
+        else if (ballvel[1] < -0.4)
+        {
+            ballvel[1] = -0.4
+        }
+        if (Math.abs(ballvel[1]) < 0.01)
+        {
+            ballvel[1] *= 2;
+        }
+
+        draw();
+    }
+
+    function draw()
+    {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0,0,canvasSize[0], canvasSize[1]);
+
+        ctx.fillStyle = "green";
+        ctx.fillRect(1+ball[0]*tileSize[0],ball[1]*tileSize[1],tileSize[0]-2,tileSize[1]-2);
+
+        ctx.fillStyle = "red"
+        for (var i = 0; i < blocks.length; i++)
+        {
+            ctx.fillRect(2+blocks[i][0]*tileSize[0],blocks[i][1]*tileSize[1],2*(tileSize[0]-2),tileSize[1]-2);
+        }
+        ctx.fillRect(2+pos[0]*tileSize[0],pos[1]*tileSize[1],(tileSize[0]-2)*2,tileSize[1]-2);
+
+
+    }
+
+
+
+
+</script>
